@@ -79,4 +79,46 @@ public class GridManager : MonoBehaviour
         }        
     }
 
+    private Vector2 currentSelection=new Vector2(-1,-1);
+
+    public void CitySelected(Vector2 pos)
+    {
+        if (currentSelection == new Vector2(-1, -1))
+        {
+            currentSelection = pos;
+        }
+        else
+        {
+            CreateRoad(pos);
+        }
+
+    }
+
+    private List<Vector2[]> createdRoads = new List<Vector2[]>();
+    public void CreateRoad(Vector2 pos2)
+    {
+        if (pos2.x == currentSelection.x)
+        {
+            Debug.Log("creer route verticale");
+            for(int y =(int)Mathf.Min(pos2.y, currentSelection.y)+1;y< (int)Mathf.Max(pos2.y, currentSelection.y); y++)
+            {
+                GetTileAtPosition(new Vector2(pos2.x,y)).VerticalRoad();
+            }
+            
+
+        }
+        if(pos2.y == currentSelection.y)
+        {
+            Debug.Log("creer route horizontale");
+            for (int x = (int)Mathf.Min(pos2.x, currentSelection.x) + 1; x < (int)Mathf.Max(pos2.x, currentSelection.x); x++)
+            {
+                GetTileAtPosition(new Vector2(x, pos2.y)).HorizontalRoad();
+            }
+        }
+        //Debug.Log("reset");
+        createdRoads.Add(new Vector2[] { pos2, currentSelection });
+        currentSelection = new Vector2(-1, -1);
+    }
+
+
 }
