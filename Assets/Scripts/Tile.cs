@@ -97,6 +97,11 @@ public class Tile : MonoBehaviour
             gridManager.GetComponent<GridManager>().CitySelected(new Vector2(int.Parse(pos[1]), int.Parse(pos[2])));
             Debug.Log(pos[1] + ' ' + pos[2]);
         }  
+        else
+        {
+            string[] pos = name.Split(' ');
+            gridManager.GetComponent<GridManager>().GrassSelecTed(new Vector2(int.Parse(pos[1]), int.Parse(pos[2])));
+        }
     }
 
 
@@ -106,6 +111,8 @@ public class Tile : MonoBehaviour
         {            
             city.SetTile(new Vector3Int(-1 + mapSize.x / 2, -y + mapSize.y / 2, 0), verticalRoad);            
         }
+
+        
     }
 
     public void DoubleVerticalRoad()
@@ -152,6 +159,16 @@ public class Tile : MonoBehaviour
         {           
             city.SetTile(new Vector3Int(-x + mapSize.x / 2, -1 + mapSize.y / 2, 0), horizontalRoad);                
         }        
+    }
+
+    public void ClearRoad() {         
+        for (int x = 0; x < mapSize.x; x++)
+        {
+            for (int y = 0; y < mapSize.y; y++)
+            {
+                city.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), null);
+            }
+        }
     }
 
 }

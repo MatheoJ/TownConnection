@@ -8,11 +8,12 @@ public class CityTile
 { 
     public int nbConnectionNeeded;
     public Dictionary<CityTile, int> connections;
+    public Vector2Int position;
 
     public CityTile()
     {
         nbConnectionNeeded = 0;
-        connections = new Dictionary<CityTile, int>();
+        connections = new Dictionary<CityTile, int>();        
     }
     public CityTile(int nbConnection)
     {
@@ -113,7 +114,7 @@ public class GridManager : MonoBehaviour
             }
             GetTileAtPosition(cities[i].position.toVector2()).CityTile(nbConnections);
             cityTileMap[(int)cities[i].position.x, (int)cities[i].position.y] = new CityTile();
-
+            cityTileMap[(int)cities[i].position.x, (int)cities[i].position.y].position = new Vector2Int(cities[i].position.x, cities[i].position.y);
         }        
     }
 
@@ -125,7 +126,7 @@ public class GridManager : MonoBehaviour
         {
             currentSelection = pos;
         }
-        else
+        else if (currentSelection != pos)
         {
             if (cityTileMap[(int)pos.x, (int)pos.y].connections.ContainsKey(cityTileMap[(int)currentSelection.x, (int)currentSelection.y]))
             {
@@ -244,5 +245,61 @@ public class GridManager : MonoBehaviour
         currentSelection = new Vector2(-1, -1);
     }
 
+    internal void GrassSelecTed(Vector2 pos)
+    {
+        if (roadTileMap[(int)pos.x, (int)pos.y] != null)
+        {
+            CityTile city1 = roadTileMap[(int)pos.x, (int)pos.y].connectedTile[0];
+            CityTile city2 = roadTileMap[(int)pos.x, (int)pos.y].connectedTile[1];
 
+            if (roadTileMap[(int)pos.x, (int)pos.y].nbRoad == 1)
+            {
+
+                city1.connections.Remove(city2);
+                city2.connections.Remove(city1);
+
+                if (city1.position.x == city2.position.x)
+                {
+                    for (int y = Math.Min(city1.position.y, city2.position.y) + 1; y < Math.Max(city1.position.y, city2.position.y); y++)
+                    {
+                        roadTileMap[city1.position.x, y] = null;
+                        GetTileAtPosition(new Vector2(city1.position.x, y)).ClearRoad();
+                    }
+                }
+                else
+                {
+                    for (int x = Math.Min(city1.position.x, city2.position.x) + 1; x < Math.Max(city1.position.x, city2.position.x); x++)
+                    {
+                        roadTileMap[x, city1.position.y] = null;
+                        GetTileAtPosition(new Vector2(x, city1.position.y)).ClearRoad();
+                    }
+                }
+            }
+            else 
+            {
+                city1.connections[city2]--;
+                city2.connections[city1]--;
+
+                if (city1.position.x == city2.position.x)
+                {
+                    for (int y = Math.Min(city1.position.y, city2.position.y) + 1; y < Math.Max(city1.position.y, city2.position.y); y++)
+                    {
+                        roadTileMap[city1.position.x, y].nbRoad--;
+                        GetTileAtPosition(new Vector2(city1.position.x, y)).ClearRoad();
+                        GetTileAtPosition(new Vector2(city1.position.x, y)).VerticalRoad();                     
+                    }
+                }
+                else
+                {
+                    for (int x = Math.Min(city1.position.x, city2.position.x) + 1; x < Math.Max(city1.position.x, city2.position.x); x++)
+                    {
+                        roadTileMap[x, city1.position.y].nbRoad--;
+                        GetTileAtPosition(new Vector2(x, city1.position.y)).ClearRoad();
+                        GetTileAtPosition(new Vector2(x, city1.position.y)).HorizontalRoad();                       
+                      
+                    }
+                }                
+            }        
+        }
+    }
 }
