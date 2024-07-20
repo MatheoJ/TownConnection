@@ -564,8 +564,8 @@ MonoBehaviour:
   grass1: {fileID: 11400000, guid: 319851295b46581478d81807c13f8727, type: 2}
   grass2: {fileID: 11400000, guid: 038f6389bd4b96f419555f30d6670826, type: 2}
   grass3: {fileID: 11400000, guid: 35fadb14753cb7d4c8c175de97f1bf78, type: 2}
-  beton: {fileID: 0}
   mapSize: {x: 3, y: 3, z: 0}
+  isCity: 0
   city: {fileID: 3887312167733841408}
   cityTiles:
   - {fileID: 11400000, guid: d0843a663601d714981b17a5462e9deb, type: 2}
@@ -587,6 +587,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 2fa80b951f593864daebed38d070ad5e, type: 2}
   - {fileID: 11400000, guid: 2d0ae6662a1ace646b811bcd814cad7c, type: 2}
   - {fileID: 11400000, guid: 90462682cff5ad0478ee535d8a63b17c, type: 2}
+  verticalRoad: {fileID: 11400000, guid: 69aa4eaf7ee774f4cbc93899fa3a2777, type: 2}
+  horizontalRoad: {fileID: 11400000, guid: c36d18e0f39414f4f81e44e2240168f2, type: 2}
 --- !u!114 &1230001983258216099
 MonoBehaviour:
   m_ObjectHideFlags: 0

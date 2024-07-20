@@ -19,12 +19,13 @@ public class Tile : MonoBehaviour
 
     public Vector3Int mapSize = new Vector3Int(3, 3, 0);
 
-    //public bool CityTile=false;
+    public bool isCity=false;
     public Tilemap city;
     public UnityEngine.Tilemaps.Tile[] cityTiles;
     public UnityEngine.Tilemaps.Tile[] numberTiles;
 
-
+    public UnityEngine.Tilemaps.Tile verticalRoad;
+    public UnityEngine.Tilemaps.Tile horizontalRoad;
 
     void Start()
     {
@@ -67,6 +68,7 @@ public class Tile : MonoBehaviour
             }
         }
         city.SetTile(new Vector3Int(-1 + mapSize.x / 2, -1 + mapSize.y / 2, 0), numberTiles[nbConnetions]);
+        isCity = true;
     }
 
     public void Init(bool isOffset)
@@ -87,8 +89,75 @@ public class Tile : MonoBehaviour
 
     private void OnMouseDown()
     {
-        Debug.Log(gridManager.GetComponent< GridManager>().GetTileAtPosition(transform.position).name);
+        //Debug.Log(gridManager.GetComponent< GridManager>().GetTileAtPosition(transform.position).name);
         //CityTile();
+        if (isCity)
+        {
+            string[] pos = name.Split(' ');
+            gridManager.GetComponent<GridManager>().CitySelected(new Vector2(int.Parse(pos[1]), int.Parse(pos[2])));
+            Debug.Log(pos[1] + ' ' + pos[2]);
+        }  
+    }
+
+
+    public void VerticalRoad()
+    {
+        for (int x = 0; x < mapSize.x; x++)
+        {
+            for (int y = 0; y < mapSize.y; y++)
+            {
+                if (x == 1)
+                {
+                    city.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), verticalRoad);
+                }
+                else
+                {
+                    switch (Random.Range(0, 3))
+                    {
+                        case 0:
+                            grass.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), grass1);
+                            break;
+                        case 1:
+                            grass.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), grass2);
+                            break;
+                        case 2:
+                            grass.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), grass3);
+                            break;
+                    }
+                }
+
+            }
+        }
+    }
+
+    public void HorizontalRoad()
+    {
+        for (int x = 0; x < mapSize.x; x++)
+        {
+            for (int y = 0; y < mapSize.y; y++)
+            {
+                if (y == 1)
+                {
+                    city.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), horizontalRoad);
+                }
+                else
+                {
+                    switch (Random.Range(0, 3))
+                    {
+                        case 0:
+                            grass.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), grass1);
+                            break;
+                        case 1:
+                            grass.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), grass2);
+                            break;
+                        case 2:
+                            grass.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), grass3);
+                            break;
+                    }
+                }
+
+            }
+        }
     }
 
 }
