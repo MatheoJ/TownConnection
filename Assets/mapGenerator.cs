@@ -36,6 +36,16 @@ public class mapGenerator : MonoBehaviour
     
 
 
+    public Vector2 toVector2() { return new Vector2(x, y); }
+}
+
+public class mapGenerator : MonoBehaviour
+{
+
+    
+
+    
+
     private Queue<City> pointsToVisit;
     private City[,] cityMap;
     private List<Point>[,] pointsTakenByConnection;
@@ -377,3 +387,5 @@ public class mapGenerator : MonoBehaviour
         }
     }
 }
+
+
