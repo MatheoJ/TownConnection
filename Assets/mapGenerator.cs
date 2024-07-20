@@ -1,37 +1,40 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using Unity.VisualScripting;
 using UnityEditor.MemoryProfiler;
 using UnityEngine;
+
+
+public class Point
+{
+    public int x;
+    public int y;
+
+    public Point(int x, int y)
+    {
+        this.x = x;
+        this.y = y;
+    }
+}
+public class City
+{
+    public Point position;
+    //hashmap of connected cities and the number of bridges between them
+    public Dictionary<Point, int> connections;
+
+    public City(Point position)
+    {
+        this.position = position;
+        connections = new Dictionary<Point, int>();
+    }
+}
 
 public class mapGenerator : MonoBehaviour
 {
 
     
-    struct Point
-    {
-        public int x;
-        public int y;
 
-        public Point(int x, int y)
-        {
-            this.x = x;
-            this.y = y;
-        }
-    }
-
-    struct City
-    {
-        public Point position;
-        //hashmap of connected cities and the number of bridges between them
-        public Dictionary<Point, int> connections;
-
-        public City(Point position)
-        {
-            this.position = position;
-            connections = new Dictionary<Point, int>();
-        }
-    }
 
     private Queue<City> pointsToVisit;
     private City[,] cityMap;
@@ -44,7 +47,8 @@ public class mapGenerator : MonoBehaviour
     {
         int width = 10;
         int height = 10;
-        int seed = 0;
+        //get random seed
+        int seed = Random.Range(0, 1000);
         int cityNumber = 5;
 
         int[,] map = generateHashiMap(width, height, seed, cityNumber);
@@ -52,7 +56,7 @@ public class mapGenerator : MonoBehaviour
         Debug.Log("here -----------------");
         Debug.Log(map);
 
-/*        for (int i = 0; i < width; i++)
+        for (int i = 0; i < width; i++)
         {
             string line = "";
             for (int j = 0; j < height; j++)
@@ -60,7 +64,7 @@ public class mapGenerator : MonoBehaviour
                 line += map[i, j] + " ";
             }
             Debug.Log(line);
-        }*/
+        }
     }
 
 
@@ -74,7 +78,9 @@ public class mapGenerator : MonoBehaviour
         //Queue to store the points to visit
         pointsToVisit = new Queue<City>();
         cityMap = new City[width, height];
+        initCityMap();
         pointsTakenByConnection = new List<Point>[width, height];
+        initPointsTakenByConnection();
         cityNumberLeft = cityNumber;
           
         //Create the first city
@@ -86,7 +92,7 @@ public class mapGenerator : MonoBehaviour
         pointsToVisit.Enqueue(firstCity);
 
         City currentCity;
-        float probabilityToCreateConnection = 0.3f;
+        float probabilityToCreateConnection = 0.7f;
 
         //while points to visit are not empty
         while (pointsToVisit.Count > 0 && cityNumber > 0)
@@ -98,8 +104,13 @@ public class mapGenerator : MonoBehaviour
                 // probability to create a new city in this direction
                 if( rand.NextDouble() < probabilityToCreateConnection)
                 {
-                    createConnectionInThisDirection(currentCity, i);
+                    Debug.Log("createConnection in direction " + i);
+                    createConnectionInThisDirection(currentCity, i);                    
                 }                    
+                else
+                {
+                       Debug.Log("no connection in direction " + i);
+                }
             }                 
         }   
 
@@ -146,13 +157,22 @@ public class mapGenerator : MonoBehaviour
             return false;
 
         //Check if a connection already exists in this direction
-        if (pointsTakenByConnection[nextX, nextY] != null)
+        if (pointsTakenByConnection[nextX, nextY].Count>0)
         {
             if (pointsTakenByConnection[nextX, nextY].Contains(currentPosition))
+            {
+                Debug.Log("add connection to existing connection in direction " + direction);
                 return addConnectionToExistingConnection(currentCity, new Point(nextX, nextY));
+            }
+            else
+            {
+                Debug.Log("create no connection in direction " + direction);
+                return false;
+            }                
         }
         else
         {
+            Debug.Log("create new connection in direction " + direction);
             return createNewConnectionInThisDirection(currentCity, xIncrement, yIncrement);
         }
 
@@ -161,7 +181,7 @@ public class mapGenerator : MonoBehaviour
 
     private bool addConnectionToExistingConnection(City currentCity, Point nextPositionInDirection)
     {
-        Point pointOfOtherCity= new Point();
+        Point pointOfOtherCity = new Point(-1, -1);
         bool otherCityFound = false;
 
         foreach (Point point in pointsTakenByConnection[nextPositionInDirection.x, nextPositionInDirection.y])
@@ -176,7 +196,7 @@ public class mapGenerator : MonoBehaviour
         if (!otherCityFound)
         {
             //Other city should be found, if not, there is a problem Log error
-            Debug.LogError("Other city not found");
+            Debug.LogError("Other city not found when it should have been because a conection was detected");
         }
 
         if (currentCity.connections.ContainsKey(pointOfOtherCity))
@@ -218,7 +238,7 @@ public class mapGenerator : MonoBehaviour
                 canContinuInThisDirection = false;
             }
             //If there is already a city in this position
-            else if (cityMap[point.x, point.y].connections.Count > 0)
+            else if (cityMap[point.x, point.y] != null)
             {
                 canContinuInThisDirection = false;
                 distInDirection++;
@@ -247,16 +267,51 @@ public class mapGenerator : MonoBehaviour
         }
 
         //Choose a random distance in the list
-        int dist = distInDirectionPossible[rand.Next(0, distInDirectionPossible.Count)];
+        int dist = 0;
+        bool distIsGood = false;
 
-        //Create the new city
+        while (!distIsGood && distInDirectionPossible.Count>0)
+        {
+            dist = distInDirectionPossible[rand.Next(0, distInDirectionPossible.Count)];
+            distIsGood = true;
+            int xTemp = currentCity.position.x + xIncrement * dist;
+            int yTemp = currentCity.position.y + yIncrement * dist;
+            //check the neighbors of the new city if there is no city
+
+            if (cityMap[xTemp+1,yTemp] != null || cityMap[xTemp-1, yTemp] != null || cityMap[xTemp, yTemp+1] != null || cityMap[xTemp, yTemp-1] != null)
+            {
+                distIsGood = false;
+                distInDirectionPossible.Remove(dist);
+            }            
+        }
+
+        if (!distIsGood)
+        {
+            Debug.Log("Every dist was blocker by a neighbour");
+            return false;
+        }
+
+        
         Point newPoint = new Point(currentCity.position.x + xIncrement * dist, currentCity.position.y + yIncrement * dist);
-        City newCity = new City(newPoint);
-        newCity.connections.Add(currentCity.position, 1);
-        currentCity.connections.Add(newPoint, 1);
-        cityMap[newPoint.x, newPoint.y] = newCity;
-        pointsToVisit.Enqueue(newCity);
-        cityNumberLeft--;
+
+        if (cityMap[newPoint.x, newPoint.y] != null)
+        {
+            Debug.LogError("City already exists in this position");
+            cityMap[newPoint.x, newPoint.y].connections.Add(currentCity.position, 1);
+            currentCity.connections.Add(newPoint, 1);
+        }
+        else
+        {
+            //Create the new city
+            City newCity = new City(newPoint);
+            newCity.connections.Add(currentCity.position, 1);
+            currentCity.connections.Add(newPoint, 1);
+            cityMap[newPoint.x, newPoint.y] = newCity;
+            pointsToVisit.Enqueue(newCity);
+            cityNumberLeft--;
+        }
+
+
 
         //Add the new city to the list of points taken by the connection
         for (int i = 1; i < dist; i++)
@@ -278,6 +333,11 @@ public class mapGenerator : MonoBehaviour
         {
             for (int j = 0; j < height; j++)
             {
+                if (cityMap[i, j] == null)
+                {
+                    map[i, j] = 0;
+                    continue;
+                }
                 foreach (KeyValuePair<Point, int> connection in cityMap[i, j].connections)
                 {
                     map[i, j] += connection.Value;
@@ -286,5 +346,34 @@ public class mapGenerator : MonoBehaviour
         }
 
         return map;
+    }
+
+    private void initCityMap() 
+    {
+        //Go throught the cityMap
+        int width = cityMap.GetLength(0);
+        int height = cityMap.GetLength(1);
+
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < height; j++)
+            {
+                cityMap[i, j] = null;
+            }
+        }
+    }
+
+    private void initPointsTakenByConnection()
+    {
+        int width = cityMap.GetLength(0);
+        int height = cityMap.GetLength(1);
+
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < height; j++)
+            {
+                pointsTakenByConnection[i, j] = new List<Point>();
+            }
+        }
     }
 }
