@@ -1,6 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using Unity.VisualScripting;
 using UnityEngine;
 
 
@@ -174,9 +177,11 @@ public class GridManager : MonoBehaviour
         if (currentSelection == new Vector2(-1, -1))
         {
             currentSelection = pos;
+            GetTileAtPosition(currentSelection).IsSelected();
         }
         else if (currentSelection != pos)
         {
+            GetTileAtPosition(currentSelection).IsSelected();
             if (cityTileMap[(int)pos.x, (int)pos.y].connections.ContainsKey(cityTileMap[(int)currentSelection.x, (int)currentSelection.y]))
             {
                 if (cityTileMap[(int)pos.x, (int)pos.y].connections[cityTileMap[(int)currentSelection.x, (int)currentSelection.y]]>1)
@@ -229,7 +234,7 @@ public class GridManager : MonoBehaviour
     private List<Vector2[]> createdRoads = new List<Vector2[]>();
     public void CreateRoad(Vector2 pos2)
     {
-
+        bool roadCreated = false;
         CityTile selecTedTile = cityTileMap[(int)currentSelection.x, (int)currentSelection.y];
         CityTile pos2Tile = cityTileMap[(int)pos2.x, (int)pos2.y];
 
@@ -253,8 +258,8 @@ public class GridManager : MonoBehaviour
                     roadTileMap[(int)pos2.x, y].nbRoad++;
                     GetTileAtPosition(new Vector2(pos2.x, y)).DoubleVerticalRoad();
                 }                
-            }         
-
+            }
+            roadCreated = true;
         }
         if(pos2.y == currentSelection.y)
         {
@@ -277,21 +282,44 @@ public class GridManager : MonoBehaviour
                 }
 
             }
-        }
-        //Debug.Log("reset");
-
-        if (pos2Tile.connections.ContainsKey(selecTedTile))
-        {
-            pos2Tile.connections[selecTedTile]++;
-            selecTedTile.connections[pos2Tile]++;
-        }
-        else
-        {
-            pos2Tile.connections.Add(selecTedTile, 1);
-            selecTedTile.connections.Add(pos2Tile, 1);
+            roadCreated = true;
         }
 
+        if (roadCreated)
+        {
+            if (pos2Tile.connections.ContainsKey(selecTedTile))
+            {
+                pos2Tile.connections[selecTedTile]++;
+                selecTedTile.connections[pos2Tile]++;
+            }
+            else
+            {
+                pos2Tile.connections.Add(selecTedTile, 1);
+                selecTedTile.connections.Add(pos2Tile, 1);
+            }
+
+
+            if (!GetTileAtPosition(pos2).GoodRoads(CountConnections(pos2Tile) == GetTileAtPosition(pos2).numConnections))
+            {
+                GetTileAtPosition(pos2).BadRoads(CountConnections(pos2Tile) > GetTileAtPosition(pos2).numConnections);
+            }
+
+            if (!GetTileAtPosition(currentSelection).GoodRoads(CountConnections(selecTedTile) == GetTileAtPosition(currentSelection).numConnections))
+            {
+                GetTileAtPosition(currentSelection).BadRoads(CountConnections(selecTedTile) > GetTileAtPosition(currentSelection).numConnections);
+            }
+        }
         currentSelection = new Vector2(-1, -1);
+    }
+
+    private int CountConnections(CityTile tile)
+    {
+        int s = 0;
+        foreach (var c in tile.connections)
+        {
+            s += c.Value;
+        }
+        return s;
     }
 
     internal void GrassSelecTed(Vector2 pos)
@@ -324,7 +352,7 @@ public class GridManager : MonoBehaviour
                     }
                 }
             }
-            else 
+            else
             {
                 city1.connections[city2]--;
                 city2.connections[city1]--;
@@ -335,7 +363,7 @@ public class GridManager : MonoBehaviour
                     {
                         roadTileMap[city1.position.x, y].nbRoad--;
                         GetTileAtPosition(new Vector2(city1.position.x, y)).ClearRoad();
-                        GetTileAtPosition(new Vector2(city1.position.x, y)).VerticalRoad();                     
+                        GetTileAtPosition(new Vector2(city1.position.x, y)).VerticalRoad();
                     }
                 }
                 else
@@ -344,11 +372,20 @@ public class GridManager : MonoBehaviour
                     {
                         roadTileMap[x, city1.position.y].nbRoad--;
                         GetTileAtPosition(new Vector2(x, city1.position.y)).ClearRoad();
-                        GetTileAtPosition(new Vector2(x, city1.position.y)).HorizontalRoad();                       
-                      
+                        GetTileAtPosition(new Vector2(x, city1.position.y)).HorizontalRoad();
+
                     }
-                }                
-            }        
+                }
+            }
+            if (!GetTileAtPosition(city1.position).GoodRoads(CountConnections(city1) == GetTileAtPosition(city1.position).numConnections))
+            {
+                GetTileAtPosition(city1.position).BadRoads(CountConnections(city1) > GetTileAtPosition(city1.position).numConnections);
+            }
+
+            if (!GetTileAtPosition(city2.position).GoodRoads(CountConnections(city2) == GetTileAtPosition(city2.position).numConnections))
+            {
+                GetTileAtPosition(city2.position).BadRoads(CountConnections(city2) > GetTileAtPosition(city2.position).numConnections);
+            }
         }
     }
 
