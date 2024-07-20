@@ -42,6 +42,8 @@ public class GridManager : MonoBehaviour
 
     [SerializeField] private Transform _cam;
 
+    [SerializeField] private Camera _camera;
+
     [SerializeField] private mapGenerator mapGenerator;
 
     private Dictionary<Vector2, Tile> _tiles;
@@ -51,10 +53,16 @@ public class GridManager : MonoBehaviour
     private CityTile[,] cityTileMap;
     private RoadTile[,] roadTileMap;
 
+    private Vector3 Origin;
+    private Vector3 Difference;
+
+    private bool drag = false;
+
 
     void Start()
     {
         GenerateGrid();
+        ChangeCameraZoomToSeeAllGrid();
 
         //get random seed
         int seed = UnityEngine.Random.Range(0, 1000);
@@ -75,7 +83,43 @@ public class GridManager : MonoBehaviour
         {
             UnityEngine.SceneManagement.SceneManager.LoadScene(1);
         }
+
+
+        //If wheel scroll is detected, zoom in or out
+        if (Input.mouseScrollDelta.y != 0)
+        {
+            _camera.orthographicSize = Mathf.Clamp(_camera.orthographicSize - Input.mouseScrollDelta.y, 1, 100);
+        }
+
+        //Moove camera if right click is dragged
+        if (Input.GetMouseButton(1))
+        {
+            Difference = (Camera.main.ScreenToWorldPoint(Input.mousePosition)) - _cam.position;
+            if (drag == false)
+            {
+                drag = true;
+                Origin = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                Difference = new Vector3(0, 0, 0);
+            }
+            else
+            {
+                Difference = (Camera.main.ScreenToWorldPoint(Input.mousePosition)) - Origin;
+            }
+
+        }
+        else
+        {
+            drag = false;
+        }
+        if (drag)
+        {
+            _cam.position = _cam.position - Difference;
+            Origin = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        }
+
     }
+    
+
 
     void GenerateGrid()
     {
@@ -96,6 +140,11 @@ public class GridManager : MonoBehaviour
         }
 
         _cam.transform.position = new Vector3((float)_width / 2 - 0.5f, (float)_height / 2 - 0.5f, -10);
+    }
+
+    void ChangeCameraZoomToSeeAllGrid()
+    {
+        _camera.orthographicSize = Mathf.Max(_width, _height) / 2;
     }
 
     public Tile GetTileAtPosition(Vector2 pos)
