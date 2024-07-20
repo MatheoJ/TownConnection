@@ -62,6 +62,8 @@ public class GridManager : MonoBehaviour
     private bool drag = false;
 
 
+    public GameObject helpText;
+    public GameObject VictoryScreen;
     void Start()
     {
         GenerateGrid();
@@ -207,7 +209,6 @@ public class GridManager : MonoBehaviour
 
         if (pos2.x == currentSelection.x)
         {
-            Debug.Log("creer route verticale");
             for (int y = (int)Mathf.Min(pos2.y, currentSelection.y) + 1; y < (int)Mathf.Max(pos2.y, currentSelection.y); y++)
             {
                 if (roadTileMap[(int)pos2.x, y]!=null || cityTileMap[(int)pos2.x, y] != null)
@@ -218,7 +219,6 @@ public class GridManager : MonoBehaviour
         }
         if (pos2.y == currentSelection.y)
         {
-            Debug.Log("creer route horizontale");
             for (int x = (int)Mathf.Min(pos2.x, currentSelection.x) + 1; x < (int)Mathf.Max(pos2.x, currentSelection.x); x++)
             {
                 if (roadTileMap[x, (int)pos2.y] != null || cityTileMap[x, (int)pos2.y] != null)
@@ -240,7 +240,6 @@ public class GridManager : MonoBehaviour
 
         if (pos2.x == currentSelection.x)
         {
-            Debug.Log("creer route verticale");
             for(int y =(int)Mathf.Min(pos2.y, currentSelection.y)+1;y< (int)Mathf.Max(pos2.y, currentSelection.y); y++)
             {
 
@@ -263,7 +262,6 @@ public class GridManager : MonoBehaviour
         }
         if(pos2.y == currentSelection.y)
         {
-            Debug.Log("creer route horizontale");
             for (int x = (int)Mathf.Min(pos2.x, currentSelection.x) + 1; x < (int)Mathf.Max(pos2.x, currentSelection.x); x++)
             {
                 if (roadTileMap[x, (int)pos2.y] == null)
@@ -297,18 +295,26 @@ public class GridManager : MonoBehaviour
                 pos2Tile.connections.Add(selecTedTile, 1);
                 selecTedTile.connections.Add(pos2Tile, 1);
             }
-
-
-            if (!GetTileAtPosition(pos2).GoodRoads(CountConnections(pos2Tile) == GetTileAtPosition(pos2).numConnections))
-            {
-                GetTileAtPosition(pos2).BadRoads(CountConnections(pos2Tile) > GetTileAtPosition(pos2).numConnections);
-            }
-
-            if (!GetTileAtPosition(currentSelection).GoodRoads(CountConnections(selecTedTile) == GetTileAtPosition(currentSelection).numConnections))
-            {
-                GetTileAtPosition(currentSelection).BadRoads(CountConnections(selecTedTile) > GetTileAtPosition(currentSelection).numConnections);
-            }
         }
+
+        if (!GetTileAtPosition(pos2).GoodRoads(CountConnections(pos2Tile) == GetTileAtPosition(pos2).numConnections))
+        {
+            GetTileAtPosition(pos2).BadRoads(CountConnections(pos2Tile) > GetTileAtPosition(pos2).numConnections);
+        }
+        else
+        {
+            CheckVictory();
+        }
+
+        if (!GetTileAtPosition(currentSelection).GoodRoads(CountConnections(selecTedTile) == GetTileAtPosition(currentSelection).numConnections))
+        {
+            GetTileAtPosition(currentSelection).BadRoads(CountConnections(selecTedTile) > GetTileAtPosition(currentSelection).numConnections);
+        }
+        else
+        {
+            CheckVictory();
+        }
+        
         currentSelection = new Vector2(-1, -1);
     }
 
@@ -380,11 +386,21 @@ public class GridManager : MonoBehaviour
             if (!GetTileAtPosition(city1.position).GoodRoads(CountConnections(city1) == GetTileAtPosition(city1.position).numConnections))
             {
                 GetTileAtPosition(city1.position).BadRoads(CountConnections(city1) > GetTileAtPosition(city1.position).numConnections);
+                helpText.SetActive(false);
+            }
+            else
+            {
+                CheckVictory();
             }
 
             if (!GetTileAtPosition(city2.position).GoodRoads(CountConnections(city2) == GetTileAtPosition(city2.position).numConnections))
             {
                 GetTileAtPosition(city2.position).BadRoads(CountConnections(city2) > GetTileAtPosition(city2.position).numConnections);
+                helpText.SetActive(false);
+            }
+            else
+            {
+                CheckVictory();
             }
         }
     }
@@ -412,5 +428,27 @@ public class GridManager : MonoBehaviour
         }
 
         return visited.Count == cities.Count;
+    }
+
+    private void CheckVictory()
+    {
+
+        foreach (City city in cities)
+        {
+            if (!GetTileAtPosition(city.position.toVector2()).hasGoodRoads)
+            {
+                return;
+            }
+        }
+        if (!areAllCitiesConnected())
+        {
+            //afficher le pb
+            helpText.SetActive(true);
+            return;
+        }
+
+        Debug.Log("victory!!!");
+        VictoryScreen.SetActive(true);
+
     }
 }

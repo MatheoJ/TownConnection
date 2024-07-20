@@ -100,14 +100,16 @@ public class mapGenerator : MonoBehaviour
 
         City currentCity;
         float probabilityToCreateConnection = 0.7f;
+        int infiniteLoopBreaker = 0;
 
         //while points to visit are not empty
-        while (cityNumberLeft > 0)
+        while (cityNumberLeft > 0 && infiniteLoopBreaker < 2 * cityNumber)
         {
-            if(pointsToVisit.Count == 0)
+            if (pointsToVisit.Count == 0)
             {
                 //Should a random city be chosen or the city with the least connections
                 addRandomCityToQueue();
+                infiniteLoopBreaker++;
             }
 
             currentCity = pointsToVisit.Dequeue();

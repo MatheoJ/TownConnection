@@ -33,7 +33,7 @@ public class Tile : MonoBehaviour
     [SerializeField] private bool isSelected = false;
     public int numConnections;
 
-    private bool hasGoodRoads = false;
+    public bool hasGoodRoads = false;
     private bool hasBadRoads = false;
 
     void Start()
@@ -216,7 +216,7 @@ public class Tile : MonoBehaviour
 
     public bool GoodRoads(bool goodRoads)
     {
-        Debug.Log("good roads?");
+        hasGoodRoads = goodRoads;
         if (!goodRoads)
         {
             int i = 0;
@@ -231,12 +231,11 @@ public class Tile : MonoBehaviour
             }
             city.SetTile(new Vector3Int(-1 + mapSize.x / 2, -1 + mapSize.y / 2, 0), numberTiles[numConnections]);
 
-            hasGoodRoads = goodRoads;
+
             return false;
         }
         else
         {
-            Debug.Log("putting green tiles");
             int i = 0;
             for (int x = 0; x < mapSize.x; x++)
             {
@@ -248,7 +247,6 @@ public class Tile : MonoBehaviour
                 }
             }
             city.SetTile(new Vector3Int(-1 + mapSize.x / 2, -1 + mapSize.y / 2, 0), numberTiles[numConnections]);
-            hasGoodRoads = goodRoads;
             return true;
         }
 
