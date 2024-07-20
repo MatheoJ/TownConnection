@@ -302,4 +302,29 @@ public class GridManager : MonoBehaviour
             }        
         }
     }
+
+    public bool areAllCitiesConnected()
+    {
+        List<CityTile> visited = new List<CityTile>();
+        List<CityTile> toVisit = new List<CityTile>();
+
+        toVisit.Add(cityTileMap[cities[0].position.x, cities[0].position.y]);
+
+        while (toVisit.Count > 0)
+        {
+            CityTile current = toVisit[0];
+            toVisit.RemoveAt(0);
+            visited.Add(current);
+
+            foreach (KeyValuePair<CityTile, int> connection in current.connections)
+            {
+                if (!visited.Contains(connection.Key) && !toVisit.Contains(connection.Key))
+                {
+                    toVisit.Add(connection.Key);
+                }
+            }
+        }
+
+        return visited.Count == cities.Count;
+    }
 }
