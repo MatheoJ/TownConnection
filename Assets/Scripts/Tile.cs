@@ -23,9 +23,18 @@ public class Tile : MonoBehaviour
     public Tilemap city;
     public UnityEngine.Tilemaps.Tile[] cityTiles;
     public UnityEngine.Tilemaps.Tile[] numberTiles;
+    public UnityEngine.Tilemaps.Tile[] redCityTiles;
+    public UnityEngine.Tilemaps.Tile[] blueCityTiles;
+    public UnityEngine.Tilemaps.Tile[] greenCityTiles;
 
     public UnityEngine.Tilemaps.Tile verticalRoad;
     public UnityEngine.Tilemaps.Tile horizontalRoad;
+
+    [SerializeField] private bool isSelected = false;
+    public int numConnections;
+
+    private bool hasGoodRoads = false;
+    private bool hasBadRoads = false;
 
     void Start()
     {
@@ -56,6 +65,7 @@ public class Tile : MonoBehaviour
 
     public void CityTile(int nbConnetions)
     {
+        numConnections=nbConnetions;
         grass.color = new Color(0, 0, 0, 0.9f);
         int i = 0;
         for (int x = 0; x < mapSize.x; x++)
@@ -161,6 +171,39 @@ public class Tile : MonoBehaviour
         }        
     }
 
+    public void IsSelected()
+    {
+        if (isSelected)
+        {
+            int i = 0;
+            for (int x = 0; x < mapSize.x; x++)
+            {
+                for (int y = 0; y < mapSize.y; y++)
+                {
+                    //grass.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), beton);
+                    city.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), cityTiles[i]);
+                    i++;
+                }
+            }
+            city.SetTile(new Vector3Int(-1 + mapSize.x / 2, -1 + mapSize.y / 2, 0), numberTiles[numConnections]);
+        }
+        else
+        {
+            int i = 0;
+            for (int x = 0; x < mapSize.x; x++)
+            {
+                for (int y = 0; y < mapSize.y; y++)
+                {
+                    //grass.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), beton);
+                    city.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), blueCityTiles[i]);
+                    i++;
+                }
+            }
+            city.SetTile(new Vector3Int(-1 + mapSize.x / 2, -1 + mapSize.y / 2, 0), numberTiles[numConnections]);
+        }
+        isSelected=!isSelected;
+    }
+
     public void ClearRoad() {         
         for (int x = 0; x < mapSize.x; x++)
         {
@@ -169,6 +212,79 @@ public class Tile : MonoBehaviour
                 city.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), null);
             }
         }
+    }
+
+    public bool GoodRoads(bool goodRoads)
+    {
+        Debug.Log("good roads?");
+        if (!goodRoads)
+        {
+            int i = 0;
+            for (int x = 0; x < mapSize.x; x++)
+            {
+                for (int y = 0; y < mapSize.y; y++)
+                {
+                    //grass.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), beton);
+                    city.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), cityTiles[i]);
+                    i++;
+                }
+            }
+            city.SetTile(new Vector3Int(-1 + mapSize.x / 2, -1 + mapSize.y / 2, 0), numberTiles[numConnections]);
+
+            hasGoodRoads = goodRoads;
+            return false;
+        }
+        else
+        {
+            Debug.Log("putting green tiles");
+            int i = 0;
+            for (int x = 0; x < mapSize.x; x++)
+            {
+                for (int y = 0; y < mapSize.y; y++)
+                {
+                    //grass.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), beton);
+                    city.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), greenCityTiles[i]);
+                    i++;
+                }
+            }
+            city.SetTile(new Vector3Int(-1 + mapSize.x / 2, -1 + mapSize.y / 2, 0), numberTiles[numConnections]);
+            hasGoodRoads = goodRoads;
+            return true;
+        }
+
+    }
+
+    public void BadRoads(bool badRoads)
+    {
+        if (!badRoads)
+        {
+            int i = 0;
+            for (int x = 0; x < mapSize.x; x++)
+            {
+                for (int y = 0; y < mapSize.y; y++)
+                {
+                    //grass.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), beton);
+                    city.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), cityTiles[i]);
+                    i++;
+                }
+            }
+            city.SetTile(new Vector3Int(-1 + mapSize.x / 2, -1 + mapSize.y / 2, 0), numberTiles[numConnections]);
+        }
+        else
+        {
+            int i = 0;
+            for (int x = 0; x < mapSize.x; x++)
+            {
+                for (int y = 0; y < mapSize.y; y++)
+                {
+                    //grass.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), beton);
+                    city.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), redCityTiles[i]);
+                    i++;
+                }
+            }
+            city.SetTile(new Vector3Int(-1 + mapSize.x / 2, -1 + mapSize.y / 2, 0), numberTiles[numConnections]);
+        }
+        hasBadRoads = badRoads;
     }
 
 }
