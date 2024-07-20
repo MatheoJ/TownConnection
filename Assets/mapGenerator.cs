@@ -1,37 +1,43 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using Unity.VisualScripting;
 using UnityEditor.MemoryProfiler;
 using UnityEngine;
+
+struct City
+{
+    public Point position;
+    //hashmap of connected cities and the number of bridges between them
+    public Dictionary<Point, int> connections;
+
+    public City(Point position)
+    {
+        this.position = position;
+        connections = new Dictionary<Point, int>();
+    }
+}
+
+struct Point
+{
+    public int x;
+    public int y;
+
+    public Point(int x, int y)
+    {
+        this.x = x;
+        this.y = y;
+    }
+
+    public Vector2 toVector2() { return new Vector2(x, y); }
+}
 
 public class mapGenerator : MonoBehaviour
 {
 
     
-    struct Point
-    {
-        public int x;
-        public int y;
 
-        public Point(int x, int y)
-        {
-            this.x = x;
-            this.y = y;
-        }
-    }
-
-    struct City
-    {
-        public Point position;
-        //hashmap of connected cities and the number of bridges between them
-        public Dictionary<Point, int> connections;
-
-        public City(Point position)
-        {
-            this.position = position;
-            connections = new Dictionary<Point, int>();
-        }
-    }
+    
 
     private Queue<City> pointsToVisit;
     private City[,] cityMap;
@@ -288,3 +294,5 @@ public class mapGenerator : MonoBehaviour
         return map;
     }
 }
+
+
