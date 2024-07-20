@@ -102,62 +102,56 @@ public class Tile : MonoBehaviour
 
     public void VerticalRoad()
     {
+        for (int y = 0; y < mapSize.y; y++)
+        {            
+            city.SetTile(new Vector3Int(-1 + mapSize.x / 2, -y + mapSize.y / 2, 0), verticalRoad);            
+        }
+    }
+
+    public void DoubleVerticalRoad()
+    {
         for (int x = 0; x < mapSize.x; x++)
         {
             for (int y = 0; y < mapSize.y; y++)
             {
-                if (x == 1)
+                if (x == 1) 
+                {
+                    city.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), null);
+                }else
                 {
                     city.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), verticalRoad);
                 }
+                
+            }
+        }
+    }
+
+    public void DoubleHorizontalRoad() 
+    {
+       for (int x = 0; x < mapSize.x; x++)
+        {
+            for (int y = 0; y < mapSize.y; y++)
+            {
+                if (y == 1)
+                {
+                    city.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), null);
+                }
                 else
                 {
-                    switch (Random.Range(0, 3))
-                    {
-                        case 0:
-                            grass.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), grass1);
-                            break;
-                        case 1:
-                            grass.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), grass2);
-                            break;
-                        case 2:
-                            grass.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), grass3);
-                            break;
-                    }
+                    city.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), horizontalRoad);
                 }
 
             }
         }
     }
 
+
     public void HorizontalRoad()
     {
         for (int x = 0; x < mapSize.x; x++)
-        {
-            for (int y = 0; y < mapSize.y; y++)
-            {
-                if (y == 1)
-                {
-                    city.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), horizontalRoad);
-                }
-                else
-                {
-                    switch (Random.Range(0, 3))
-                    {
-                        case 0:
-                            grass.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), grass1);
-                            break;
-                        case 1:
-                            grass.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), grass2);
-                            break;
-                        case 2:
-                            grass.SetTile(new Vector3Int(-x + mapSize.x / 2, -y + mapSize.y / 2, 0), grass3);
-                            break;
-                    }
-                }
-
-            }
-        }
+        {           
+            city.SetTile(new Vector3Int(-x + mapSize.x / 2, -1 + mapSize.y / 2, 0), horizontalRoad);                
+        }        
     }
 
 }
