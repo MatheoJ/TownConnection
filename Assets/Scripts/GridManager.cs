@@ -11,6 +11,8 @@ public class GridManager : MonoBehaviour
 
     [SerializeField] private Transform _cam;
 
+    [SerializeField] private mapGenerator mapGenerator;
+
     private Dictionary<Vector2, Tile> _tiles;
 
     [SerializeField] private List<City> cities=new();
@@ -18,14 +20,24 @@ public class GridManager : MonoBehaviour
     void Start()
     {
         GenerateGrid();
-        cities.Add(new City(new Point(1,2)) );
-        cities.Add(new City(new Point(13, 2)));
-        cities.Add(new City(new Point(13, 7)));
-        cities.Add(new City(new Point(7, 7)));
-        cities.Add(new City(new Point(4, 4)));
-        cities.Add(new City(new Point(13, 4)));
+
+        //get random seed
+        int seed = UnityEngine.Random.Range(0, 1000);
+        int cityNumber = 5;
+
+        cities = mapGenerator.generateHashiMap(_width, _height, seed, cityNumber);
+
         PlaceCities(cities);
 
+    }
+
+    void Update()
+    {
+        //If R is pressed, reload the scene
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene(1);
+        }
     }
 
     void GenerateGrid()
@@ -58,9 +70,13 @@ public class GridManager : MonoBehaviour
     private void PlaceCities(List<City> cities)
     {
         for (int i = 0; i < cities.Count; i++) {
-            GetTileAtPosition(cities[i].position.toVector2()).CityTile(7);
-        }
-        
+            int nbConnections = 0;
+            foreach (KeyValuePair<Point, int> connection in cities[i].connections)
+            {
+                nbConnections += connection.Value;
+            }
+            GetTileAtPosition(cities[i].position.toVector2()).CityTile(nbConnections);
+        }        
     }
 
 }

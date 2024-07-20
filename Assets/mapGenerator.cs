@@ -16,6 +16,10 @@ public class Point
         this.x = x;
         this.y = y;
     }
+    public Vector2 toVector2()
+    {
+        return new Vector2(x, y);
+    }
 }
 public class City
 {
@@ -32,22 +36,11 @@ public class City
 
 public class mapGenerator : MonoBehaviour
 {
-
-    
-
-
-    public Vector2 toVector2() { return new Vector2(x, y); }
-}
-
-public class mapGenerator : MonoBehaviour
-{
-
-    
-
-    
+  
 
     private Queue<City> pointsToVisit;
     private City[,] cityMap;
+    private List<City> cityList;
     private List<Point>[,] pointsTakenByConnection;
     private int cityNumberLeft;
     private System.Random rand;
@@ -55,7 +48,7 @@ public class mapGenerator : MonoBehaviour
 
     private void Start()
     {
-        int width = 10;
+/*        int width = 10;
         int height = 10;
         //get random seed
         int seed = Random.Range(0, 1000);
@@ -74,15 +67,14 @@ public class mapGenerator : MonoBehaviour
                 line += map[i, j] + " ";
             }
             Debug.Log(line);
-        }
+        }*/
     }
 
 
 
     // Generate the matrice of the map
-    public int[,] generateHashiMap(int width, int height, int seed, int cityNumber)
+    public List<City> generateHashiMap(int width, int height, int seed, int cityNumber)
     {
-        int[,] map = new int[width, height];
         rand = new System.Random(seed);
 
         //Queue to store the points to visit
@@ -91,6 +83,9 @@ public class mapGenerator : MonoBehaviour
         initCityMap();
         pointsTakenByConnection = new List<Point>[width, height];
         initPointsTakenByConnection();
+        pointsToVisit = new Queue<City>();
+        cityList = new List<City>();
+
         cityNumberLeft = cityNumber;
           
         //Create the first city
@@ -98,33 +93,42 @@ public class mapGenerator : MonoBehaviour
         int startY = rand.Next(0, height);
         City firstCity = new City(new Point(startX, startY));
         cityMap[startX, startY] = firstCity;
+        
         cityNumberLeft--;
         pointsToVisit.Enqueue(firstCity);
+        cityList.Add(firstCity);
 
         City currentCity;
         float probabilityToCreateConnection = 0.7f;
 
         //while points to visit are not empty
-        while (pointsToVisit.Count > 0 && cityNumber > 0)
+        while (cityNumberLeft > 0)
         {
+            if(pointsToVisit.Count == 0)
+            {
+                //Should a random city be chosen or the city with the least connections
+                addRandomCityToQueue();
+            }
+
             currentCity = pointsToVisit.Dequeue();
 
-            for(int i = 0; i < 4; i++)
-            {
-                // probability to create a new city in this direction
-                if( rand.NextDouble() < probabilityToCreateConnection)
-                {
-                    Debug.Log("createConnection in direction " + i);
-                    createConnectionInThisDirection(currentCity, i);                    
-                }                    
-                else
-                {
-                       Debug.Log("no connection in direction " + i);
-                }
-            }                 
-        }   
+            bool atLeastOneDirectionWasChoosen= false;
 
-        map = getNbConnectionMapFromCityMap();
+            while (!atLeastOneDirectionWasChoosen) { 
+                for(int i = 0; i < 4; i++)
+                {
+                    // probability to create a new city in this direction
+                    if( rand.NextDouble() < probabilityToCreateConnection)
+                    {
+                        Debug.Log("createConnection in direction " + i);
+                        createConnectionInThisDirection(currentCity, i);
+                        atLeastOneDirectionWasChoosen = true;
+                    } 
+                }
+            }
+        }
+
+        List <City> map = getCityListFromCityMap();
 
         return map;
     }
@@ -185,8 +189,6 @@ public class mapGenerator : MonoBehaviour
             Debug.Log("create new connection in direction " + direction);
             return createNewConnectionInThisDirection(currentCity, xIncrement, yIncrement);
         }
-
-        return false;
     }
 
     private bool addConnectionToExistingConnection(City currentCity, Point nextPositionInDirection)
@@ -306,17 +308,23 @@ public class mapGenerator : MonoBehaviour
 
         if (cityMap[newPoint.x, newPoint.y] != null)
         {
-            Debug.LogError("City already exists in this position");
+            Debug.Log("City already exists in this position");
             cityMap[newPoint.x, newPoint.y].connections.Add(currentCity.position, 1);
             currentCity.connections.Add(newPoint, 1);
         }
         else
         {
+            if(cityNumberLeft<=0)
+            {
+                return false;
+            }
+
             //Create the new city
             City newCity = new City(newPoint);
             newCity.connections.Add(currentCity.position, 1);
             currentCity.connections.Add(newPoint, 1);
             cityMap[newPoint.x, newPoint.y] = newCity;
+            cityList.Add(newCity);
             pointsToVisit.Enqueue(newCity);
             cityNumberLeft--;
         }
@@ -357,6 +365,25 @@ public class mapGenerator : MonoBehaviour
 
         return map;
     }
+    
+    private List<City> getCityListFromCityMap()
+    {
+        List<City> cities = new List<City>();
+        int width = cityMap.GetLength(0);
+        int height = cityMap.GetLength(1);
+
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < height; j++)
+            {
+                if (cityMap[i, j] != null)
+                {
+                    cities.Add(cityMap[i, j]);
+                }
+            }
+        }
+        return cities;
+    }
 
     private void initCityMap() 
     {
@@ -385,6 +412,12 @@ public class mapGenerator : MonoBehaviour
                 pointsTakenByConnection[i, j] = new List<Point>();
             }
         }
+    }
+
+    private void addRandomCityToQueue()
+    {
+        //pick random city from cityList
+        pointsToVisit.Enqueue(cityList[rand.Next(0, cityList.Count)]);
     }
 }
 
