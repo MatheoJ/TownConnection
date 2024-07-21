@@ -8,6 +8,7 @@ public class Tile : MonoBehaviour
     [SerializeField] private Color _baseColor, _offsetColor;
     [SerializeField] private SpriteRenderer _renderer;
     [SerializeField] private GameObject _highlight;
+    [SerializeField] private AudioSource soundClick;
 
     GameObject gridManager;
     public Tilemap grass;
@@ -112,6 +113,8 @@ public class Tile : MonoBehaviour
             string[] pos = name.Split(' ');
             gridManager.GetComponent<GridManager>().GrassSelecTed(new Vector2(int.Parse(pos[1]), int.Parse(pos[2])));
         }
+
+        soundClick.Play();
     }
 
 
