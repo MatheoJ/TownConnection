@@ -5,7 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
 using UnityEngine;
-
+using UnityEngine.UI;
 
 public class CityTile
 { 
@@ -53,6 +53,8 @@ public class GridManager : MonoBehaviour
 
     [SerializeField] private List<City> cities=new();
 
+
+
     private CityTile[,] cityTileMap;
     private RoadTile[,] roadTileMap;
 
@@ -64,6 +66,7 @@ public class GridManager : MonoBehaviour
 
     public GameObject helpText;
     public GameObject VictoryScreen;
+    public Button startMenuButton;
     void Start()
     {
         GenerateGrid();
@@ -78,6 +81,8 @@ public class GridManager : MonoBehaviour
         roadTileMap = new RoadTile[_width, _height];
 
         PlaceCities(cities);
+
+        startMenuButton.onClick.AddListener(LauncheStartMenu);
 
     }
 
@@ -456,5 +461,10 @@ public class GridManager : MonoBehaviour
         Debug.Log("victory!!!");
         VictoryScreen.SetActive(true);
 
+    }
+
+    public void LauncheStartMenu()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("StartScene");
     }
 }
