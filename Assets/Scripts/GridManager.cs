@@ -179,11 +179,16 @@ public class GridManager : MonoBehaviour
         if (currentSelection == new Vector2(-1, -1))
         {
             currentSelection = pos;
-            GetTileAtPosition(currentSelection).IsSelected();
+            GetTileAtPosition(currentSelection).IsSelected(true);
         }
         else if (currentSelection != pos)
         {
-            GetTileAtPosition(currentSelection).IsSelected();
+            GetTileAtPosition(currentSelection).IsSelected(false);
+            Debug.Log(CountConnections(cityTileMap[(int)pos.x, (int)pos.y]));
+            if (!GetTileAtPosition(currentSelection).GoodRoads(CountConnections(cityTileMap[(int)currentSelection.x, (int)currentSelection.y]) == GetTileAtPosition(currentSelection).numConnections))
+            {
+                GetTileAtPosition(currentSelection).BadRoads(CountConnections(cityTileMap[(int)currentSelection.x, (int)currentSelection.y]) > GetTileAtPosition(currentSelection).numConnections);
+            }
             if (cityTileMap[(int)pos.x, (int)pos.y].connections.ContainsKey(cityTileMap[(int)currentSelection.x, (int)currentSelection.y]))
             {
                 if (cityTileMap[(int)pos.x, (int)pos.y].connections[cityTileMap[(int)currentSelection.x, (int)currentSelection.y]]>1)
@@ -197,10 +202,11 @@ public class GridManager : MonoBehaviour
                 currentSelection = new Vector2(-1, -1);
                 return;
             }
-
+            
             CreateRoad(pos);
+            
         }
-
+        
     }
 
     private bool checkedForRoadsOrCity(Vector2 currentSelection, Vector2 pos2)

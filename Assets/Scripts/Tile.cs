@@ -174,9 +174,9 @@ public class Tile : MonoBehaviour
         }        
     }
 
-    public void IsSelected()
+    public void IsSelected(bool selected)
     {
-        if (isSelected)
+        if (!selected)
         {
             int i = 0;
             for (int x = 0; x < mapSize.x; x++)
@@ -204,7 +204,7 @@ public class Tile : MonoBehaviour
             }
             city.SetTile(new Vector3Int(-1 + mapSize.x / 2, -1 + mapSize.y / 2, 0), numberTiles[numConnections]);
         }
-        isSelected=!isSelected;
+        //isSelected=!isSelected;
     }
 
     public void ClearRoad() {         
