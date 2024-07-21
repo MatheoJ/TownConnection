@@ -74,7 +74,16 @@ public class GridManager : MonoBehaviour
 
         //get random seed
         int seed = UnityEngine.Random.Range(0, 1000);
-        int cityNumber = 12;
+        int cityNumber =12;
+
+        if (StartManager.difficulty == "easy")
+        {
+            cityNumber = 8;
+        }
+        else if (StartManager.difficulty == "hard")
+        {
+            cityNumber = 20;
+        }
 
         cities = mapGenerator.generateHashiMap(_width, _height, seed, cityNumber);
         cityTileMap = new CityTile[_width, _height];

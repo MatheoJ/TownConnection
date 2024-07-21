@@ -9,6 +9,9 @@ public class StartManager : MonoBehaviour
     public Button startButton;
     public GameObject startCanva;
     public GameObject rulesCanva;
+    public Dropdown diffucltyDrodown;
+
+    public static string difficulty = "medium";
 
     // Start is called before the first frame update
     void Start()
@@ -33,6 +36,23 @@ public class StartManager : MonoBehaviour
     public void StartGame()
     {
         Debug.Log("Game Started");
+
+        Debug.Log(diffucltyDrodown.value);
+
+
+        switch (diffucltyDrodown.value)
+        {
+            case 0:
+                difficulty = "medium";
+                break;
+            case 1:
+                difficulty = "easy";
+                break;
+            case 2:
+                difficulty = "hard";
+                break;
+        }
+
         UnityEngine.SceneManagement.SceneManager.LoadScene("map");
     }
 }
